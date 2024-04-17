@@ -1,0 +1,94 @@
+version: '3.1'
+
+services:
+  redis:
+    image: redis
+    # restart: always
+    ports:
+      - 6379:6379
+    networks:
+      - devnets
+
+  # postgres:
+  #   image: timescale/timescaledb:latest-pg14
+  #   # restart: always
+  #   volumes:
+  #     - timescaledata:/var/lib/postgresql/data
+  #   environment:
+  #     POSTGRES_PASSWORD: 123456
+  #   # network_mode: "host"
+  #   ports:
+  #     - 5432:5432
+  #   networks:
+  #     - devnets
+  
+  
+  mysql:
+    image: bitnami/mysql:8.0.36
+    # restart: always
+    volumes:
+      - mysqldata:/bitnami/mysql/data
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    ports:
+      - 3306:3306
+    networks:
+      - devnets
+    
+    
+  #pgbouncer:
+  #  image: bitnami/pgbouncer:1.17.0
+  #  # restart: always
+  #  environment:
+  #    POSTGRESQL_USERNAME: "postgres"
+  #    POSTGRESQL_PASSWORD: "123456"
+  #    POSTGRESQL_HOST: "postgres"
+  #    POSTGRESQL_PORT: "5432"
+  #    POSTGRESQL_DATABASE: "pdd-spph-unittest"
+  #    PGBOUNCER_DATABASE: "pdd-spph-unittest"
+  #    PGBOUNCER_PORT: "5433"
+  #  # network_mode: "host"
+  #  ports:
+  #    - 5433:5433
+  #  networks:
+  #    - devnets
+
+  adminer:
+    image: adminer:latest
+    # restart: always
+    ports:
+      - 127.0.0.1:8089:8080
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # https://stackoverflow.com/a/43541732extra_hosts:
+      - "db:host-gateway"
+    environment:
+      ADMINER_PLUGINS: "version-noverify"
+      ADMINER_DEFAULT_SERVER: "mysql"
+      # ADMINER_DESIGN: "nette"
+    networks:
+      - devnets
+
+      
+  # mongo:
+  #   image: bitnami/mongodb:5.0.24
+  #   # restart: always
+  #   ports:
+  #     - 27017:27017
+  #   environment:
+  #     ALLOW_EMPTY_PASSWORD: "yes"
+  #   volumes:
+  #     - mongodbdata:/bitnami/mongodb      
+  #   networks:
+  #     - devnets
+
+networks:
+  devnets:
+    ipam:
+      driver: default
+      config:
+        - subnet: "192.168.123.0/24"
+
+volumes:
+  timescaledata:
+  mysqldata:
+  mongodbdata:
